@@ -8,6 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import jsonfile from 'jsonfile';
+import { Status } from '../models/beeperType.js';
+import { coordinatesList } from '../data/coordinates.js';
 export const writeBeepersToJson = (beeper) => __awaiter(void 0, void 0, void 0, function* () {
     jsonfile.readFile('./data/db.json')
         .then(beepers => {
@@ -26,3 +28,31 @@ export const getBeepersFromJson = () => __awaiter(void 0, void 0, void 0, functi
     }
     return beepers;
 });
+export function updateStatus(beeper) {
+    switch (beeper.status) {
+        case Status[0]:
+            beeper.status = Status[1];
+            return false;
+        case Status[1]:
+            beeper.status = Status[2];
+            return false;
+        case Status[2]:
+            beeper.status = Status[3];
+            return true;
+        case Status[3]:
+            beeper.status = Status[4];
+            return false;
+    }
+    return false;
+}
+export function checkCoordinates(coordinates) {
+    return coordinatesList.some(coord => coord.lat === coordinates.latitude && coord.lon === coordinates.longitude);
+}
+export function setBeeperToMission(beeper, coordinates) {
+    beeper.latitude = coordinates.latitude;
+    beeper.longitude = coordinates.longitude;
+}
+export function startMission(beeper) {
+    return __awaiter(this, void 0, void 0, function* () {
+    });
+}

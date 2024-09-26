@@ -4,4 +4,5 @@ export var Status;
     Status[Status["assembled"] = 1] = "assembled";
     Status[Status["shipped"] = 2] = "shipped";
     Status[Status["deployed"] = 3] = "deployed";
+    Status[Status["detonated"] = 4] = "detonated";
 })(Status || (Status = {}));

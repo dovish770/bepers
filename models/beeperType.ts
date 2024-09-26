@@ -12,5 +12,11 @@ export enum Status {
     manufactured,
     assembled,
     shipped,
-    deployed
+    deployed,
+    detonated
+}
+
+export interface Coordinates {
+    latitude:number,
+    longitude:number
 }

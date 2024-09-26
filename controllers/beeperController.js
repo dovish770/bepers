@@ -7,15 +7,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import { Status } from '../models/beeperType.js';
 import { v4 as uuidv4 } from 'uuid';
-import { writeBeepersToJson, getBeepersFromJson } from '../DAL/jsonService.js';
+import { writeBeepersToJson, getBeepersFromJson, updateStatus, checkCoordinates, setBeeperToMission, startMission } from '../DAL/bookService.js';
 import jsonfile from 'jsonfile';
 export const createBeeper = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const beeper = {
             id: uuidv4(),
             name: req.body.name,
-            status: 'manufactured',
+            status: Status[0],
             createdAt: new Date()
         };
         yield writeBeepersToJson(beeper);
@@ -83,26 +84,23 @@ export const editBeepersStatus = (req, res) => __awaiter(void 0, void 0, void 0,
             if (beepers.length > 0) {
                 const beeperIndex = beepers.findIndex((b) => b.id === req.params.id);
                 if (beeperIndex === -1) {
-                    res.status(400).send("Invalid user ID.");
+                    return res.status(400).send("Invalid beeper ID.");
                 }
-                beepers[beeperIndex].status = updateStatus(beepers[beeperIndex]);
+                const isDeployed = updateStatus(beepers[beeperIndex]);
+                if (isDeployed) {
+                    const coordinates = req.body;
+                    if (!checkCoordinates(coordinates)) {
+                        return res.status(400).send("Invalid coordinations.");
+                    }
+                    setBeeperToMission(beepers[beeperIndex], coordinates);
+                    yield startMission(beepers[beeperIndex]);
+                }
                 yield jsonfile.writeFile('./data/db.json', beepers);
                 res.status(200).json('status was updated successfully');
             }
         }
     }
-    catch (_a) {
-        res.status(500).send("An error occurred while deleting the beeper.");
+    catch (error) {
+        res.status(500).send("An error occurred while updating status.");
     }
 });
-function updateStatus(beeper) {
-    switch (beeper.status) {
-        case "manufactured":
-            return "assembled";
-        case "assembled":
-            return "shipped";
-        case "shipped":
-            return "deployed";
-    }
-    return "";
-}
