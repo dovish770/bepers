@@ -1,7 +1,9 @@
 import express from 'express';
-import { createBeeper, getAllBeepers, getOneBeeper } from '../controllers/beeperController.js';
+import { createBeeper, deleteBeeper, editBeepersStatus, getAllBeepers, getOneBeeper } from '../controllers/beeperController.js';
 const router = express.Router();
 router.route('/beepers').post(createBeeper);
 router.route('/beepers').get(getAllBeepers);
 router.route('/beepers/:id').get(getOneBeeper);
+router.route('/beepers/:id').delete(deleteBeeper);
+router.route('/beepers/:id').put(editBeepersStatus);
 export default router;

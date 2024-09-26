@@ -52,3 +52,57 @@ export const getOneBeeper = async (req: Request, res: Response)=>{
         res.status(404).send("An error occurred while getting beeper.");
     }
 }
+
+export const deleteBeeper = async (req:Request, res:Response) => {
+    try {
+        let beepers = await getBeepersFromJson();
+        
+        if (beepers) {
+            if(beepers.length > 0){
+                const beeperIndex = beepers.findIndex((b) => b.id === req.params.id);
+                if (beeperIndex === -1) {
+                    res.status(400).send("Invalid user ID.");
+                }
+                beepers = beepers.filter(b => b.id !== req.params.id);
+                await jsonfile.writeFile('./data/db.json', beepers);
+                res.status(200).json('beeper was deleted successfully');
+            }
+        }
+    } catch{
+        res.status(500).send("An error occurred while deleting the beeper.");
+    }
+}
+
+export const editBeepersStatus = async (req:Request, res:Response) => {
+    try {
+        let beepers = await getBeepersFromJson();
+        
+        if (beepers) {
+            if(beepers.length > 0){
+                const beeperIndex = beepers.findIndex((b) => b.id === req.params.id);
+                if (beeperIndex === -1) {
+                    res.status(400).send("Invalid user ID.");
+                }
+
+                beepers[beeperIndex].status = updateStatus(beepers[beeperIndex]);
+                await jsonfile.writeFile('./data/db.json', beepers);  
+
+                res.status(200).json('status was updated successfully');
+            }
+        }
+    } catch {
+        res.status(500).send("An error occurred while deleting the beeper.");
+    }
+}
+
+function updateStatus(beeper:Beeper):string{
+    switch(beeper.status) {
+        case "manufactured":
+            return "assembled";
+        case "assembled":
+            return "shipped";
+        case "shipped":
+            return "deployed";
+    }
+    return "";
+}
