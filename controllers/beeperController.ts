@@ -85,33 +85,37 @@ export const editBeepersStatus = async (req: Request, res: Response) => {
         let beepers = await getBeepersFromJson();
 
         if (beepers) {
-            if (beepers.length > 0) {
+            if (beepers && beepers.length > 0) {
                 const beeperIndex = beepers.findIndex((b) => b.id === req.params.id);
                 if (beeperIndex === -1) {
                     res.status(400).send("Invalid beeper ID.");
                 }
 
-                const isDeployed: boolean = updateStatus(beepers[beeperIndex]);
-                if (isDeployed) {
+                const isFinished: boolean = updateStatus(beepers[beeperIndex]);
+                if (isFinished) {
+                    res.status(400).send("cant change status");
+                }
+                                             
+                await jsonfile.writeFile('./data/db.json', beepers);
+                res.status(200).json('Status was updated successfully to - ' + beepers[beeperIndex].status);
+
+                if (beepers[beeperIndex].status === "deployed"){
                     const coordinates: Coordinates = req.body;
 
                     if (!checkCoordinates(coordinates)) {
-                        res.status(400).send("Invalid coordinations.");
+                        res.status(400).send("Invalid coordinates.");
                     }
-
                     setBeeperToMission(beepers[beeperIndex], coordinates);
                     startMission(beepers[beeperIndex]);
                 }
-
-                await jsonfile.writeFile('./data/db.json', beepers);
-
-                res.status(200).json('status was updated successfully to - ' + beepers[beeperIndex].status);
             }
         }
     } catch (error) {
         res.status(500).send("An error occurred while updating status.");
     }
 };
+                
+
 
 
 

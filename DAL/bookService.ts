@@ -26,6 +26,8 @@ export const getBeepersFromJson = async()=> {
 }
 
 export function updateStatus(beeper:Beeper):boolean{
+    console.log(123);
+    
     switch(beeper.status) {
         case Status[0]:
             beeper.status = Status[1];
@@ -35,13 +37,13 @@ export function updateStatus(beeper:Beeper):boolean{
             return false
         case Status[2]:
             beeper.status = Status[3];
-            return true         
+            return false         
         case Status[3]:
             beeper.status = Status[4];
             beeper.detonatedAt = new Date();
             return false         
     }
-    return false
+    return true
 }
 
 export function checkCoordinates(coordinates:Coordinates){
@@ -54,8 +56,5 @@ export function setBeeperToMission(beeper:Beeper, coordinates:Coordinates){
 }
 
 export async function startMission(beeper:Beeper){
-    await new Promise<void> ((resolve) => setTimeout(() => {
-        updateStatus(beeper);
-        resolve()
-    },10000));
+    setTimeout(() => updateStatus(beeper),10000);
 }
