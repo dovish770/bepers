@@ -4,8 +4,8 @@ export interface Beeper {
     status: string, 
     createdAt: Date, 
     detonatedAt?: Date,
-    latitude?: Number, 
-    longitude?: Number, 
+    latitude: Number, 
+    longitude: Number, 
 }
 
 export enum Status {

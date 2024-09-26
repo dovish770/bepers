@@ -2,6 +2,7 @@ import jsonfile from 'jsonfile';
 import {Beeper, Coordinates, Status} from '../models/beeperType.js';
 import {coordinatesList} from '../data/coordinates.js';
 
+
 export const writeBeepersToJson = async(beeper:Beeper)=>{
     jsonfile.readFile('./data/db.json')
     .then(beepers=>{
@@ -37,6 +38,7 @@ export function updateStatus(beeper:Beeper):boolean{
             return true         
         case Status[3]:
             beeper.status = Status[4];
+            beeper.detonatedAt = new Date();
             return false         
     }
     return false
@@ -52,5 +54,8 @@ export function setBeeperToMission(beeper:Beeper, coordinates:Coordinates){
 }
 
 export async function startMission(beeper:Beeper){
-    
+    await new Promise<void> ((resolve) => setTimeout(() => {
+        updateStatus(beeper);
+        resolve()
+    },10000));
 }

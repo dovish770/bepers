@@ -17,10 +17,17 @@ export const createBeeper = (req, res) => __awaiter(void 0, void 0, void 0, func
             id: uuidv4(),
             name: req.body.name,
             status: Status[0],
-            createdAt: new Date()
+            createdAt: new Date(),
+            latitude: 0,
+            longitude: 0
         };
-        yield writeBeepersToJson(beeper);
-        res.status(201).send('beeper created successfully');
+        if (beeper.name) {
+            yield writeBeepersToJson(beeper);
+            res.status(201).send('beeper created successfully');
+        }
+        else {
+            res.status(400).send('body request is invalid');
+        }
     }
     catch (_a) {
         res.status(500).send("An error occurred while creating the new beeper.");
@@ -45,7 +52,7 @@ export const getOneBeeper = (req, res) => __awaiter(void 0, void 0, void 0, func
             if (beepers.length > 0) {
                 const beeperIndex = beepers.findIndex((b) => b.id === req.params.id);
                 if (beeperIndex === -1) {
-                    res.status(400).send("Invalid user ID.");
+                    res.status(400).send("Invalid beeper ID.");
                 }
                 res.status(200).json(beepers[beeperIndex]);
             }
@@ -69,8 +76,11 @@ export const deleteBeeper = (req, res) => __awaiter(void 0, void 0, void 0, func
                 }
                 beepers = beepers.filter(b => b.id !== req.params.id);
                 yield jsonfile.writeFile('./data/db.json', beepers);
-                res.status(200).json('beeper was deleted successfully');
+                res.status(200).send('beeper was deleted successfully');
             }
+        }
+        else {
+            res.status(400).send('beeper was not found');
         }
     }
     catch (_a) {
@@ -84,19 +94,19 @@ export const editBeepersStatus = (req, res) => __awaiter(void 0, void 0, void 0,
             if (beepers.length > 0) {
                 const beeperIndex = beepers.findIndex((b) => b.id === req.params.id);
                 if (beeperIndex === -1) {
-                    return res.status(400).send("Invalid beeper ID.");
+                    res.status(400).send("Invalid beeper ID.");
                 }
                 const isDeployed = updateStatus(beepers[beeperIndex]);
                 if (isDeployed) {
                     const coordinates = req.body;
                     if (!checkCoordinates(coordinates)) {
-                        return res.status(400).send("Invalid coordinations.");
+                        res.status(400).send("Invalid coordinations.");
                     }
                     setBeeperToMission(beepers[beeperIndex], coordinates);
-                    yield startMission(beepers[beeperIndex]);
+                    startMission(beepers[beeperIndex]);
                 }
                 yield jsonfile.writeFile('./data/db.json', beepers);
-                res.status(200).json('status was updated successfully');
+                res.status(200).json('status was updated successfully to - ' + beepers[beeperIndex].status);
             }
         }
     }

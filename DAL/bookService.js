@@ -41,6 +41,7 @@ export function updateStatus(beeper) {
             return true;
         case Status[3]:
             beeper.status = Status[4];
+            beeper.detonatedAt = new Date();
             return false;
     }
     return false;
@@ -54,5 +55,9 @@ export function setBeeperToMission(beeper, coordinates) {
 }
 export function startMission(beeper) {
     return __awaiter(this, void 0, void 0, function* () {
+        yield new Promise((resolve) => setTimeout(() => {
+            updateStatus(beeper);
+            resolve();
+        }, 10000));
     });
 }
