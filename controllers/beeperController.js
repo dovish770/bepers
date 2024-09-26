@@ -39,17 +39,20 @@ export const getAllBeepers = (req, res) => __awaiter(void 0, void 0, void 0, fun
 export const getOneBeeper = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const beepers = yield getBeepersFromJson();
-        if (beepers || beepers.length > 0) {
-            const beeperIndex = beepers.findIndex((b) => b.id === req.params.id);
-            if (beeperIndex === -1) {
-                return res.status(400).send("Invalid user ID.");
+        if (beepers) {
+            if (beepers.length > 0) {
+                const beeperIndex = beepers.findIndex((b) => b.id === req.params.id);
+                if (beeperIndex === -1) {
+                    res.status(400).send("Invalid user ID.");
+                }
+                res.status(200).json(beepers[beeperIndex]);
             }
-            res.status(200).json(users[userIndex].books);
         }
         else {
             res.status(404).send("No Beepers found.");
         }
     }
     catch (_a) {
+        res.status(404).send("An error occurred while getting beeper.");
     }
 });
